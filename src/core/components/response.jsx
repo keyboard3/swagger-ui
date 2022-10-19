@@ -5,6 +5,7 @@ import cx from "classnames"
 import { fromJS, Seq, Iterable, List, Map } from "immutable"
 import { getExtensions, getSampleSchema, fromJSOrdered, stringify } from "core/utils"
 import { getKnownSyntaxHighlighterLanguage } from "core/utils/jsonParse"
+import { RouteContext } from "../context"
 
 
 const getExampleComponent = ( sampleResponse, HighlightCode, getConfigs ) => {
@@ -172,8 +173,10 @@ export default class Response extends React.Component {
     )
 
     let example = getExampleComponent( sampleResponse, HighlightCode, getConfigs )
-
+    // eslint-disable-next-line react/prop-types
+    this.props.sampleResponse = sampleResponse
     return (
+      <RouteContext.Provider value={this.props}>
       <tr className={ "response " + ( className || "") } data-code={code}>
         <td className="response-col_status">
           { code }
@@ -271,6 +274,7 @@ export default class Response extends React.Component {
           : <i>No links</i>}
         </td> : null}
       </tr>
+      </RouteContext.Provider>
     )
   }
 }

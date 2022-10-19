@@ -3,8 +3,12 @@ import PropTypes from "prop-types"
 import ImPropTypes from "react-immutable-proptypes"
 import cx from "classnames"
 import randomBytes from "randombytes"
+import { RouteContext } from "../context"
+import { stringify } from "core/utils"
 
 export default class ModelExample extends React.Component {
+
+  static contextType = RouteContext
   static propTypes = {
     getComponent: PropTypes.func.isRequired,
     specSelectors: PropTypes.object.isRequired,
@@ -64,7 +68,8 @@ export default class ModelExample extends React.Component {
     const examplePanelId = randomBytes(5).toString("base64")
     const modelTabId = randomBytes(5).toString("base64")
     const modelPanelId = randomBytes(5).toString("base64")
-
+    const TextArea = getComponent("TextArea")
+    console.log("----this.context ",this.context)
     let isOAS3 = specSelectors.isOAS3()
 
     return (
@@ -98,6 +103,22 @@ export default class ModelExample extends React.Component {
               </button>
             </li>
           )}
+          <li className={cx("tabitem", { active: this.state.activeTab === "mockData" })} role="presentation">
+            <button
+              aria-controls={""}
+              aria-selected={this.state.activeTab === "mockData"}
+              className="tablinks"
+              data-name="mockData"
+              id={"mockData Id"}
+              onClick={ this.activeTab }
+              role="tab"
+            >
+              mockData Value
+            </button>
+            <button>
+              保存
+            </button>
+          </li>
         </ul>
         {this.state.activeTab === "example" && (
           <div
@@ -135,6 +156,11 @@ export default class ModelExample extends React.Component {
             />
           </div>
         )}
+        {
+          this.state.activeTab=="mockData" && (
+            <TextArea className={ "body-param__text"} value={stringify(this.context.sampleResponse)} onChange={ this.handleOnChange }/>
+          )
+        }
       </div>
     )
   }
