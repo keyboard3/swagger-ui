@@ -1,15 +1,21 @@
 /* eslint-disable no-undef */
-window.onload = function() {
+window.onload = function () {
   window["SwaggerUIBundle"] = window["swagger-ui-bundle"]
   window["SwaggerUIStandalonePreset"] = window["swagger-ui-standalone-preset"]
   // Build a system
   const ui = SwaggerUIBundle({
-    url: "https://petstore.swagger.io/v2/swagger.json",
+    url: "http://127.0.0.1:3000/api/doc",
     dom_id: "#swagger-ui",
     presets: [
       SwaggerUIBundle.presets.apis,
       SwaggerUIStandalonePreset
     ],
+    requestInterceptor: (req) => { 
+      if(req.url.indexOf("/api")<0) {
+        req.url = req.url.replace(/:\d{4}/,":3000/api"); 
+      }
+      return req; 
+    },
     plugins: [
       SwaggerUIBundle.plugins.DownloadUrl
     ],

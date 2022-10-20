@@ -174,9 +174,8 @@ export default class Response extends React.Component {
 
     let example = getExampleComponent( sampleResponse, HighlightCode, getConfigs )
     // eslint-disable-next-line react/prop-types
-    this.props.sampleResponse = sampleResponse
     return (
-      <RouteContext.Provider value={this.props}>
+      <RouteContext.Provider value={{...this.props, sampleResponse}}>
       <tr className={ "response " + ( className || "") } data-code={code}>
         <td className="response-col_status">
           { code }

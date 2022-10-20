@@ -32,17 +32,68 @@ export default class ModelExample extends React.Component {
       activeTab = "example"
     }
 
-    if(isExecute) {
+    if (isExecute) {
       activeTab = "example"
     }
 
     this.state = {
       activeTab,
+      mockDataValue: context.sampleResponse
     }
   }
+  handleOnChange = (e) => {
+    this.setState({ mockDataValue: e.target.value })
+  }
 
-  activeTab = ( e ) => {
-    let { target : { dataset : { name } } } = e
+  componentDidMount() {
+    this.getMockData();
+  }
+
+  getMockData() {
+    fetch("http://127.0.0.1:3000/api/get-mock-data", {
+      method: 'POST', // *GET, POST, PUT, DELETE, etc.
+      mode: 'cors', // no-cors, *cors, same-origin
+      cache: 'no-cache', // *default, no-cache, reload, force-cache, only-if-cached
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      redirect: 'follow', // manual, *follow, error
+      referrerPolicy: 'no-referrer', // no-referrer, *no-referrer-when-downgrade, origin, origin-when-cross-origin, same-origin, strict-origin, strict-origin-when-cross-origin, unsafe-url
+      body: JSON.stringify({
+        path: this.context.path,
+        method: this.context.method,
+      })
+    }).then(res => res.json())
+      .then(result => {
+        if (!result) return null;
+        this.setState({ mockDataValue: result.mockDataValue })
+      })
+      .catch(err=>{
+        console.error(err)
+      })
+  }
+
+  saveMockdata() {
+    fetch("http://127.0.0.1:3000/api/save-mock-data", {
+      method: 'POST', // *GET, POST, PUT, DELETE, etc.
+      mode: 'cors', // no-cors, *cors, same-origin
+      cache: 'no-cache', // *default, no-cache, reload, force-cache, only-if-cached
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      redirect: 'follow', // manual, *follow, error
+      referrerPolicy: 'no-referrer', // no-referrer, *no-referrer-when-downgrade, origin, origin-when-cross-origin, same-origin, strict-origin, strict-origin-when-cross-origin, unsafe-url
+      body: JSON.stringify({
+        path: this.context.path,
+        method: this.context.method,
+        mockDataValue: this.state.mockDataValue
+      })
+    })
+
+  }
+
+  activeTab = (e) => {
+    let { target: { dataset: { name } } } = e
 
     this.setState({
       activeTab: name
@@ -69,7 +120,6 @@ export default class ModelExample extends React.Component {
     const modelTabId = randomBytes(5).toString("base64")
     const modelPanelId = randomBytes(5).toString("base64")
     const TextArea = getComponent("TextArea")
-    console.log("----this.context ",this.context)
     let isOAS3 = specSelectors.isOAS3()
 
     return (
@@ -82,13 +132,13 @@ export default class ModelExample extends React.Component {
               className="tablinks"
               data-name="example"
               id={exampleTabId}
-              onClick={ this.activeTab }
+              onClick={this.activeTab}
               role="tab"
             >
               {isExecute ? "Edit Value" : "Example Value"}
             </button>
           </li>
-          { schema && (
+          {schema && (
             <li className={cx("tabitem", { active: this.state.activeTab === "model" })} role="presentation">
               <button
                 aria-controls={modelPanelId}
@@ -96,10 +146,10 @@ export default class ModelExample extends React.Component {
                 className={cx("tablinks", { inactive: isExecute })}
                 data-name="model"
                 id={modelTabId}
-                onClick={ this.activeTab }
+                onClick={this.activeTab}
                 role="tab"
               >
-                {isOAS3 ? "Schema" : "Model" }
+                {isOAS3 ? "Schema" : "Model"}
               </button>
             </li>
           )}
@@ -110,12 +160,12 @@ export default class ModelExample extends React.Component {
               className="tablinks"
               data-name="mockData"
               id={"mockData Id"}
-              onClick={ this.activeTab }
+              onClick={this.activeTab}
               role="tab"
             >
-              mockData Value
+              mock data
             </button>
-            <button>
+            <button onClick={this.saveMockdata.bind(this)}>
               保存
             </button>
           </li>
@@ -130,7 +180,7 @@ export default class ModelExample extends React.Component {
             tabIndex="0"
           >
             {example ? example : (
-              <HighlightCode value="(no example available)" getConfigs={ getConfigs } />
+              <HighlightCode value="(no example available)" getConfigs={getConfigs} />
             )}
           </div>
         )}
@@ -145,20 +195,20 @@ export default class ModelExample extends React.Component {
             tabIndex="0"
           >
             <ModelWrapper
-              schema={ schema }
-              getComponent={ getComponent }
-              getConfigs={ getConfigs }
-              specSelectors={ specSelectors }
-              expandDepth={ defaultModelExpandDepth }
+              schema={schema}
+              getComponent={getComponent}
+              getConfigs={getConfigs}
+              specSelectors={specSelectors}
+              expandDepth={defaultModelExpandDepth}
               specPath={specPath}
-              includeReadOnly = {includeReadOnly}
-              includeWriteOnly = {includeWriteOnly}
+              includeReadOnly={includeReadOnly}
+              includeWriteOnly={includeWriteOnly}
             />
           </div>
         )}
         {
-          this.state.activeTab=="mockData" && (
-            <TextArea className={ "body-param__text"} value={stringify(this.context.sampleResponse)} onChange={ this.handleOnChange }/>
+          this.state.activeTab == "mockData" && (
+            <TextArea className={"body-param__text"} value={stringify(this.state.mockDataValue)} onChange={this.handleOnChange} />
           )
         }
       </div>
